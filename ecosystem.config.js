@@ -7,12 +7,12 @@ module.exports = {
       name: 'estatebank',
       script: 'npm',
       args: 'start',
-      cwd: '/home/cloudpanel/htdocs/estatebank.in', // Update with your actual domain path
-      instances: 1, // Use 'max' for cluster mode
-      exec_mode: 'fork', // Use 'cluster' for multiple instances
+      cwd: '/home/estatebanknew/htdocs/estatebank.in',
+      instances: 1,
+      exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3002,
       },
       error_file: './logs/pm2-error.log',
       out_file: './logs/pm2-out.log',

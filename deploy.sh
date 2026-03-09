@@ -66,10 +66,10 @@ MAX_RETRIES=30
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if curl -f http://localhost:3000/api/health > /dev/null 2>&1; then
+    if curl -f http://localhost:3002/api/health > /dev/null 2>&1; then
         echo -e "${GREEN}✅ Application is running!${NC}"
         echo ""
-        echo "🌐 Application URL: http://localhost:3000"
+        echo "🌐 Application URL: http://localhost:3002 (estatebank.in)"
         echo "📊 View logs: docker compose logs -f app"
         echo "🛑 Stop application: docker compose down"
         exit 0

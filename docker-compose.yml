@@ -9,12 +9,13 @@ services:
     container_name: estatebank-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3002:3002"
     depends_on:
       mongodb:
         condition: service_healthy
     environment:
       - NODE_ENV=production
+      - PORT=3002
       - MONGODB_URI=${MONGODB_URI:-mongodb://admin:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DATABASE:-estatebank}?authSource=admin}
       - JWT_SECRET=${JWT_SECRET}
       - BREVO_SMTP_HOST=${BREVO_SMTP_HOST}
