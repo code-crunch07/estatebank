@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Bed, Bath, Square, ArrowUpRight, Tag, Grid3x3, Home, Eye, MessageSquare, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, Bed, Eye, MessageSquare, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { getPropertyUrl, formatIndianPrice } from "@/lib/utils";
 import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary-client";
@@ -63,37 +63,46 @@ export function PropertyCard({ property }: PropertyCardProps) {
     window.open(whatsappUrl, "_blank");
   };
 
-  // Get property type (Residential/Commercial) or default
-  const propertyWithSegment = property as Property & { segment?: "residential" | "commercial" };
-  const propertyType = propertyWithSegment.segment === "commercial" ? "Commercial" : propertyWithSegment.segment === "residential" ? "Residential" : property.type || "Residential";
-  
-  // Format BHK configuration
-  const bhkConfig = property.bedrooms ? `${property.bedrooms} BHK${property.bedrooms > 1 ? "s" : ""}` : "N/A";
+  // Format BHK configuration - use capacities if available (e.g. "2BHK And 3BHK")
+  const capacities = (property as any).capacities;
+  const bhkConfig = Array.isArray(capacities) && capacities.length > 0
+    ? capacities.join(" And ")
+    : property.bedrooms
+      ? `${property.bedrooms} BHK${property.bedrooms > 1 ? "s" : ""}`
+      : "N/A";
   
   // Get statuses for badges (support both array and single string)
   const statuses = Array.isArray(property.status) ? property.status : (property.status ? [property.status] : ["Available"]);
+  const primaryStatus = statuses[0] || "Available";
+  const isReadyToMove = ["Ready to Move", "READY TO MOVE", "Completed", "COMPLETED", "Available", "AVAILABLE"].some(
+    (s) => primaryStatus.toLowerCase() === s.toLowerCase()
+  );
   const statusColors: Record<string, string> = {
-    "New Launch": "bg-orange-500",
-    "NEW LAUNCH": "bg-orange-500",
-    "Under Construction": "bg-orange-500",
-    "UNDER CONSTRUCTION": "bg-orange-500",
-    "Available": "bg-green-500",
-    "AVAILABLE": "bg-green-500",
-    "Completed": "bg-blue-500",
-    "COMPLETED": "bg-blue-500",
-    "Hot": "bg-red-500",
-    "HOT": "bg-red-500",
-    "Resale": "bg-purple-500",
-    "RESALE": "bg-purple-500",
-    "Near Possession": "bg-teal-500",
-    "NEAR POSSESSION": "bg-teal-500",
+    "New Launch": "bg-slate-700",
+    "NEW LAUNCH": "bg-slate-700",
+    "Under Construction": "bg-slate-700",
+    "UNDER CONSTRUCTION": "bg-slate-700",
+    "Available": "bg-emerald-600",
+    "AVAILABLE": "bg-emerald-600",
+    "Completed": "bg-emerald-600",
+    "COMPLETED": "bg-emerald-600",
+    "Ready to Move": "bg-emerald-600",
+    "READY TO MOVE": "bg-emerald-600",
+    "Hot": "bg-slate-700",
+    "HOT": "bg-slate-700",
+    "Resale": "bg-slate-700",
+    "RESALE": "bg-slate-700",
+    "Near Possession": "bg-slate-700",
+    "NEAR POSSESSION": "bg-slate-700",
     "Sold": "bg-gray-500",
     "SOLD": "bg-gray-500",
-    "Reserved": "bg-yellow-500",
-    "RESERVED": "bg-yellow-500",
-    "Coming Soon": "bg-indigo-500",
-    "COMING SOON": "bg-indigo-500",
+    "Reserved": "bg-primary",
+    "RESERVED": "bg-primary",
+    "Coming Soon": "bg-slate-700",
+    "COMING SOON": "bg-slate-700",
   };
+  const yearTag = (property as any).commencementDate || (property as any).dateAvailableFrom || null;
+  const yearDisplay = yearTag ? (yearTag.match(/\d{4}/)?.[0] || yearTag) : null;
 
   const handleSendOTP = async () => {
     if (!mobile || mobile.length !== 10) {
@@ -295,20 +304,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
           </Link>
           
-          {/* Type Badge - Top Left */}
-          {property.type && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm ${
-                property.type.toLowerCase() === 'rent' 
-                  ? 'bg-blue-500/90 text-white' 
-                  : 'bg-green-500/90 text-white'
-              }`}>
-                {property.type.toUpperCase()}
-              </span>
-            </div>
-          )}
+          {/* Status Tag - Top Left (single clean badge) */}
+          <div className="absolute top-3 left-3 z-10">
+            <span className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide shadow-lg ${
+              statusColors[primaryStatus] || statusColors[primaryStatus.toUpperCase()] || "bg-slate-700"
+            } text-white`}>
+              {isReadyToMove ? "Ready to Move" : primaryStatus}
+            </span>
+          </div>
           
-          {/* Action buttons overlay - Top right */}
+          {/* Share button - Top right (on hover) */}
           <div className={`absolute top-3 right-3 flex gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
             <button
               onClick={handleShare}
@@ -319,25 +324,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </button>
           </div>
           
-          {/* Status Tags - Bottom Left */}
-          <div className="absolute bottom-3 left-3 z-10 flex flex-wrap gap-2 max-w-[calc(100%-24px)]">
-            {statuses.slice(0, 3).map((status, index) => {
-              const statusBg = statusColors[status] || statusColors[status.toUpperCase()] || "bg-orange-500";
-              return (
-                <div 
-                  key={`${status}-${index}`}
-                  className={`${statusBg} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'}`}
-                >
-                  {status.toUpperCase()}
-                </div>
-              );
-            })}
-            {statuses.length > 3 && (
-              <div className="bg-gray-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                +{statuses.length - 3}
-              </div>
-            )}
-          </div>
+          {/* Year Tag - Bottom Left */}
+          {yearDisplay && (
+            <div className="absolute bottom-3 left-3 z-10">
+              <span className="px-3 py-1.5 rounded bg-slate-700/90 text-white text-xs font-bold shadow-lg">
+                {yearDisplay}
+              </span>
+            </div>
+          )}
           
           {/* Image Navigation Arrows - Always visible when multiple images exist */}
           {hasMultipleImages && (
@@ -368,76 +362,56 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
         <CardContent className="p-5 pb-4 flex-1 flex flex-col">
           <Link href={getPropertyUrl(property)} className="block">
-            {/* Property Name - Bold, Black */}
-            <h3 className="text-lg font-bold mb-0 text-gray-900 line-clamp-2 min-h-[3.5rem] group-hover:text-primary transition-colors duration-300">
+            <h3 className="text-lg font-bold mb-1 text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-300">
               {property.name}
             </h3>
           </Link>
 
-          {/* Property Description - Two Liner */}
-          {property.description && (
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2 -mt-1">
-              {property.description}
+          {/* Address / Location */}
+          {displayAddress && (
+            <p className="text-sm text-gray-600 mb-1 line-clamp-1 truncate">
+              {displayAddress}
             </p>
           )}
 
-          {/* Key Information Grid */}
-          <div className="space-y-3 mb-4 flex-1">
-            {/* First Row: Location | Property Type */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-1.5 min-w-0 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group/item">
-                <MapPin className="h-4 w-4 text-green-600 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                <span className="text-sm text-gray-700 truncate">{property.location}</span>
-              </div>
-              <div className="flex items-center gap-1.5 min-w-0 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group/item">
-                <Tag className="h-4 w-4 text-green-600 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                <span className="text-sm text-gray-700 truncate">{propertyType}</span>
-              </div>
-            </div>
-
-            {/* Second Row: BHK Configuration | Area */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-1.5 min-w-0 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group/item">
-                <Grid3x3 className="h-4 w-4 text-green-600 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                <span className="text-sm text-gray-700 truncate">{bhkConfig}</span>
-              </div>
-              <div className="flex items-center gap-1.5 min-w-0 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group/item">
-                <Home className="h-4 w-4 text-green-600 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                <span className="text-sm text-gray-700 truncate">{property.area}</span>
-              </div>
-            </div>
+          {/* City with MapPin */}
+          <div className="flex items-center gap-1.5 min-w-0 mb-3">
+            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+            <span className="text-sm text-gray-600 truncate">{property.location}</span>
           </div>
 
-          {/* Price Information */}
-          <div className="mb-4">
-            <p className="text-base">
-              <span className="text-gray-600">Price </span>
-              <span className="font-bold text-primary">
-                {formatIndianPrice(property.price)}
-              </span>
+          {/* Starting Price */}
+          <div className="mb-3">
+            <p className="text-base font-bold text-gray-900">
+              Starting Price {formatIndianPrice(property.price)}
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Bedroom Configuration */}
+          <div className="flex items-center gap-1.5 min-w-0 mb-4">
+            <Bed className="h-4 w-4 text-primary flex-shrink-0" />
+            <span className="text-sm text-gray-600">
+              Bedroom: {bhkConfig}
+              {property.area && ` • ${property.area}`}
+            </span>
+          </div>
+
+          {/* Action Buttons - See Details (gold) | Contact Us (dark) */}
           <div className="flex gap-2 mt-auto">
-            {/* View Details Button - Transparent with Border */}
             <Link href={getPropertyUrl(property)} className="flex-1 min-w-0">
               <Button
-                variant="outline"
-                className="w-full bg-transparent hover:bg-primary hover:text-primary-foreground hover:border-primary border-gray-300 text-gray-900 font-normal rounded-lg flex items-center justify-center gap-1.5 text-sm px-2 py-2 h-auto transition-all duration-300 hover:scale-105"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 h-auto transition-all duration-300 hover:scale-[1.02]"
               >
-                <Eye className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="truncate">View Details</span>
+                <Eye className="h-4 w-4 flex-shrink-0" />
+                See Details
               </Button>
             </Link>
-
-            {/* Connect with Expert Button - Primary Color (Logo Color) */}
             <Button
               onClick={handleWhatsApp}
-              className="flex-1 min-w-0 bg-primary hover:bg-primary/90 text-primary-foreground font-normal rounded-lg flex items-center justify-center gap-1.5 text-sm px-2 py-2 h-auto transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
+              className="flex-1 min-w-0 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 h-auto transition-all duration-300 hover:scale-[1.02]"
             >
-              <MessageSquare className="h-3.5 w-3.5 flex-shrink-0" />
-              <span className="truncate">Connect with</span>
+              <MessageSquare className="h-4 w-4 flex-shrink-0" />
+              Contact Us
             </Button>
           </div>
         </CardContent>

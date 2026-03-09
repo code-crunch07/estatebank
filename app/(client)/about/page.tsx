@@ -145,7 +145,7 @@ export default function AboutPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/80 to-gray-900/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
         </div>
         
         {/* Animated Background Elements */}
@@ -374,7 +374,7 @@ export default function AboutPage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                     <h3 className="text-2xl font-bold mb-2">Powai &amp; Chandivali</h3>
                     <p className="text-white/90">Premium residential micro-markets</p>
@@ -419,24 +419,24 @@ export default function AboutPage() {
               </div>
 
               <div className="relative">
-                <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-10 text-white relative overflow-hidden">
+                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 rounded-3xl p-10 text-gray-900 relative overflow-hidden border border-primary/20">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                   
                   <div className="relative z-10">
                     <Globe className="h-16 w-16 mb-6 text-primary" />
                     <h3 className="text-3xl font-bold mb-4">Worldwide Recognition</h3>
-                    <p className="text-gray-300 text-lg mb-8">
+                    <p className="text-gray-600 text-lg mb-8">
                       Known as &apos;REAL DEALS&apos; globally, we serve clients from UAE, Middle East, and across India with premium real estate services.
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/20">
+                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-primary/20">
                       <div>
                         <div className="text-4xl font-bold mb-1 text-primary">UAE</div>
-                        <div className="text-sm text-gray-400">Primary Market</div>
+                        <div className="text-sm text-gray-600">Primary Market</div>
                       </div>
                       <div>
                         <div className="text-4xl font-bold mb-1 text-primary">India</div>
-                        <div className="text-sm text-gray-400">Headquarters</div>
+                        <div className="text-sm text-gray-600">Headquarters</div>
                       </div>
                     </div>
                   </div>
@@ -518,7 +518,7 @@ export default function AboutPage() {
               </div>
 
               <div className="relative">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-900">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100">
                   <video
                     autoPlay
                     muted
@@ -529,7 +529,7 @@ export default function AboutPage() {
                     <source src="https://www.estatebank.in/uploads/about_image/video_20200727114642.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"></div>
                   <div className="absolute bottom-6 left-6 flex items-center gap-3 text-white">
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
                       <Play className="h-5 w-5 fill-white" />
@@ -679,14 +679,14 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      <section className="py-20 md:py-28 bg-gradient-to-br from-gray-100 via-primary/5 to-gray-100 text-gray-900 border-t border-primary/10">
         <div className="w-full px-6 md:px-12 lg:px-20">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1.5 bg-primary/10 backdrop-blur-sm rounded-full text-sm font-medium mb-4 text-gray-900">
               The Experts Behind Success
             </span>
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Meet Our Team</h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
               Dedicated professionals committed to making your real estate journey seamless. Our team brings decades of combined experience in the real estate industry.
             </p>
           </div>
@@ -694,7 +694,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 lg:gap-10 max-w-[110rem] mx-auto">
             {teamMembers.map((member, index) => (
               <div key={index} className="group">
-                <div className="relative bg-gray-800 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl hover:shadow-primary/30">
+                <div className="relative bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl hover:shadow-primary/30 border border-primary/10">
                   {/* Image Container */}
                   <div className="relative aspect-[3/4] min-h-[400px] overflow-hidden">
                     {member.image && member.image.trim() ? (
@@ -709,14 +709,14 @@ export default function AboutPage() {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                        <span className="text-6xl font-bold text-white">
+                      <div className="w-full h-full flex items-center justify-center bg-primary/20">
+                        <span className="text-6xl font-bold text-primary">
                           {member.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent opacity-70 group-hover:opacity-90 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity"></div>
                     
                     {/* Social Media Icons */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
@@ -753,28 +753,28 @@ export default function AboutPage() {
                     </div>
                     
                     {member.bio && member.bio.trim() && (
-                      <p className="text-gray-400 mb-5 italic text-base">&quot;{member.bio}&quot;</p>
+                      <p className="text-gray-600 mb-5 italic text-base">&quot;{member.bio}&quot;</p>
                     )}
                     
                     <div className="space-y-4">
                       {member.department && member.department.trim() && (
-                        <div className="flex items-center gap-4 text-gray-400 hover:text-white transition-colors">
-                          <div className="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center">
+                        <div className="flex items-center gap-4 text-gray-600 hover:text-primary transition-colors">
+                          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                             <Building2 className="h-5 w-5 text-primary" />
                           </div>
                           <span className="text-base">{member.department}</span>
                         </div>
                       )}
                       {member.location && member.location.trim() && (
-                        <div className="flex items-center gap-4 text-gray-400 hover:text-white transition-colors">
-                          <div className="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center">
+                        <div className="flex items-center gap-4 text-gray-600 hover:text-primary transition-colors">
+                          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                             <MapPin className="h-5 w-5 text-primary" />
                           </div>
                           <span className="text-base">{member.location}</span>
                         </div>
                       )}
-                      <div className="flex items-start gap-4 text-gray-400">
-                        <div className="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-start gap-4 text-gray-600">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                           <Phone className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex flex-col text-base">

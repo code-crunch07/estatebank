@@ -97,7 +97,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     // Use all slides in the correct order from dashboard (banners + properties mixed)
     slides = allSlides.map((slide) => ({
       property: slide.property,
-      image: slide.image || "/20200513110502.jpg",
+      image: slide.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80",
       linkUrl: slide.linkUrl,
       title: slide.title || undefined,
       description: slide.description || undefined,
@@ -107,7 +107,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     // Use full banner slides with title, description, buttonText
     slides = bannerSlides.map((banner) => ({
       property: null as Property | null,
-      image: banner.image || "/20200513110502.jpg",
+      image: banner.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80",
       linkUrl: banner.linkUrl,
       title: banner.title,
       description: banner.description,
@@ -118,7 +118,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     if (properties.length > 0) {
       const propertySlides = properties.map((prop) => ({
         property: prop,
-        image: prop.images?.[0] || "/20200513110502.jpg"
+        image: prop.images?.[0] || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80"
       }));
       slides = [...slides, ...propertySlides];
     }
@@ -126,7 +126,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     // Use banner images from dashboard (legacy format)
     slides = images.map((img, index) => ({
       property: null as Property | null,
-      image: img || "/20200513110502.jpg",
+      image: img || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80",
       linkUrl: bannerLinks[index] || undefined
     }));
     
@@ -134,7 +134,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     if (properties.length > 0) {
       const propertySlides = properties.map((prop) => ({
         property: prop,
-        image: prop.images?.[0] || "/20200513110502.jpg"
+        image: prop.images?.[0] || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80"
       }));
       slides = [...slides, ...propertySlides];
     }
@@ -142,12 +142,12 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
     // Fallback to properties if no banner images
     slides = properties.map((prop) => ({
       property: prop,
-      image: prop.images?.[0] || "/20200513110502.jpg"
+      image: prop.images?.[0] || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80"
     }));
   }
 
   if (slides.length === 0) {
-    slides.push({ property: null as Property | null, image: "/20200513110502.jpg" });
+    slides.push({ property: null as Property | null, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80" });
   }
 
   return (

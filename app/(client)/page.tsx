@@ -182,6 +182,8 @@ export default function HomePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const defaultHeroImage = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80";
+  
   // Process hero images to get properties and banner images in order
   const activeHeroImages = heroImages
     .filter(img => img.status === "Active")
@@ -235,7 +237,7 @@ export default function HomePage() {
         // Don't optimize here - HeroSlider will optimize it
         const propertyImage = (property as any).featuredImage 
           || property.images?.[0] 
-          || "/20200513110502.jpg";
+          || defaultHeroImage;
         
         heroSlides.push({
           property: property,
@@ -288,6 +290,15 @@ export default function HomePage() {
   
   // If we have hero images from dashboard, use them; otherwise use default properties
   const useHeroImages = activeHeroImages.length > 0;
+
+  // Fallback slides when no hero images from dashboard - use first 3 properties
+  const fallbackSlides = heroSlides.length === 0 && properties.length > 0
+    ? properties.slice(0, 3).map((p) => ({
+        property: p,
+        image: (p as any).featuredImage || p.images?.[0] || defaultHeroImage,
+        linkUrl: undefined as string | undefined,
+      }))
+    : heroSlides;
   
   // Get recently added properties (sorted by id descending, most recent first)
   const recentlyAddedProperties = [...properties]
@@ -355,25 +366,29 @@ export default function HomePage() {
         <QuickEnquiryForm />
       </Suspense>
 
-      {/* Hero Slider — KEPT AS IS */}
-      {isLoading && heroSlides.length === 0 ? (
+      {/* Hero Slider — shows dashboard hero images, or fallback to first 3 properties */}
+      {isLoading && fallbackSlides.length === 0 ? (
         <HeroSliderSkeleton />
+      ) : fallbackSlides.length > 0 ? (
+        <HeroSlider 
+          properties={useHeroImages ? heroProperties : properties.slice(0, 3)} 
+          images={useHeroImages && heroBannerImages.length > 0 ? heroBannerImages : undefined}
+          bannerLinks={useHeroImages && heroBannerLinks.length > 0 ? heroBannerLinks : undefined}
+          bannerSlides={useHeroImages && heroBannerSlides.length > 0 ? heroBannerSlides : undefined}
+          allSlides={useHeroImages && heroSlides.length > 0 ? heroSlides : fallbackSlides}
+        />
       ) : (
-        heroSlides.length > 0 && (
-          <HeroSlider 
-            properties={useHeroImages ? heroProperties : properties.slice(0, 3)} 
-            images={useHeroImages && heroBannerImages.length > 0 ? heroBannerImages : undefined}
-            bannerLinks={useHeroImages && heroBannerLinks.length > 0 ? heroBannerLinks : undefined}
-            bannerSlides={useHeroImages && heroBannerSlides.length > 0 ? heroBannerSlides : undefined}
-            allSlides={useHeroImages && heroSlides.length > 0 ? heroSlides : undefined}
-          />
-        )
+        /* Absolute fallback: single placeholder slide when no properties */
+        <HeroSlider 
+          properties={[]} 
+          allSlides={[{ property: null, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80" }]}
+        />
       )}
 
-      {/* ─── Search Bar — dark floating card ─── */}
+      {/* ─── Search Bar — light floating card ─── */}
       <section className="relative -mt-10 md:-mt-20 z-30 mb-0">
         <div className="container mx-auto px-4">
-          <Card className="shadow-2xl border-0 bg-gray-900/95 backdrop-blur-xl rounded-2xl overflow-hidden">
+          <Card className="shadow-2xl border border-gray-200/80 bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden">
             <form onSubmit={handleSearch} className="p-4 md:p-6">
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row gap-3">
@@ -384,13 +399,13 @@ export default function HomePage() {
                       placeholder="Search by location, property name, or features..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-base bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-primary rounded-xl transition-all"
+                      className="pl-12 h-14 text-base bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-500 focus:border-primary focus:bg-white rounded-xl transition-all"
                     />
                   </div>
                   <Button 
                     type="submit" 
                     size="lg" 
-                    className="h-14 px-8 rounded-xl text-base font-semibold shadow-lg hover:shadow-xl transition-all bg-primary text-gray-900 hover:bg-primary/90"
+                    className="h-14 px-8 rounded-xl text-base font-semibold shadow-lg hover:shadow-xl transition-all bg-primary text-white hover:bg-primary/90"
                   >
                     <Search className="mr-2 h-5 w-5" />
                     Search
@@ -403,7 +418,7 @@ export default function HomePage() {
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-800 border-gray-700 text-white rounded-xl transition-all [&>span]:text-gray-300" suppressHydrationWarning>
+                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
                             <SelectValue placeholder="Location" />
                           </SelectTrigger>
                           <SelectContent>
@@ -417,7 +432,7 @@ export default function HomePage() {
                       <div className="relative">
                         <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                         <Select value={selectedType} onValueChange={setSelectedType}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-800 border-gray-700 text-white rounded-xl transition-all [&>span]:text-gray-300" suppressHydrationWarning>
+                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
                             <SelectValue placeholder="Type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -431,7 +446,7 @@ export default function HomePage() {
                       <div className="relative">
                         <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                         <Select value={selectedPrice} onValueChange={setSelectedPrice}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-800 border-gray-700 text-white rounded-xl transition-all [&>span]:text-gray-300" suppressHydrationWarning>
+                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
                             <SelectValue placeholder="Price Range" />
                           </SelectTrigger>
                           <SelectContent>
@@ -446,7 +461,7 @@ export default function HomePage() {
                       <div className="relative">
                         <Bed className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                         <Select value={selectedBedrooms} onValueChange={setSelectedBedrooms}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-800 border-gray-700 text-white rounded-xl transition-all [&>span]:text-gray-300" suppressHydrationWarning>
+                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
                             <SelectValue placeholder="Bedrooms" />
                           </SelectTrigger>
                           <SelectContent>
@@ -463,7 +478,7 @@ export default function HomePage() {
                   ) : (
                     <>
                       {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-12 bg-gray-800 rounded-xl animate-pulse" />
+                        <div key={i} className="h-12 bg-gray-200 rounded-xl animate-pulse" />
                       ))}
                     </>
                   )}
@@ -486,7 +501,7 @@ export default function HomePage() {
               const Icon = tp.icon;
               return (
                 <div key={i} className="group text-center">
-                  <div className="mx-auto w-16 h-16 rounded-2xl bg-gray-900 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg border border-primary/20">
                     <Icon className="h-7 w-7 text-primary" />
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1.5 text-base">{tp.title}</h4>
@@ -498,15 +513,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── Stats — dark strip with gold numbers ─── */}
-      <section className="py-12 bg-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(201,168,78,0.08),transparent_60%)]"></div>
+      {/* ─── Stats — light strip with gold numbers ─── */}
+      <section className="py-12 bg-primary/5 relative overflow-hidden border-y border-primary/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(201,168,78,0.12),transparent_60%)]"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl md:text-5xl font-bold text-primary mb-1">{stat.value}</div>
-                <div className="text-sm text-gray-400 font-medium tracking-wide uppercase">{stat.label}</div>
+                <div className="text-sm text-gray-600 font-medium tracking-wide uppercase">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -522,18 +537,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── About — Split: dark left, image right ─── */}
+      {/* ─── About — Split: light left, image right ─── */}
       <section className="py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-          {/* Left — Dark panel */}
-          <div className="bg-gray-900 text-white flex items-center">
+          {/* Left — Light panel */}
+          <div className="bg-gray-50 text-gray-900 flex items-center border-r border-gray-200">
             <div className="px-8 md:px-16 lg:px-20 py-16 lg:py-20 max-w-xl">
               <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-4">About EstateBANK.in</p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-gray-900">
                 Building Wealth Through Property Since 2004
               </h2>
-              <p className="text-gray-300 leading-relaxed mb-8">
-                What started as a single-handed project by <span className="text-white font-semibold">Mr. Pankaj Nagpal</span> has grown into one of Mumbai&apos;s most trusted real estate agencies. Associated with <span className="text-white font-semibold">CREBAI India</span>, we bring two decades of market expertise to every deal.
+              <p className="text-gray-600 leading-relaxed mb-8">
+                What started as a single-handed project by <span className="text-gray-900 font-semibold">Mr. Pankaj Nagpal</span> has grown into one of Mumbai&apos;s most trusted real estate agencies. Associated with <span className="text-gray-900 font-semibold">CREBAI India</span>, we bring two decades of market expertise to every deal.
               </p>
 
               <div className="grid grid-cols-2 gap-x-8 gap-y-6 mb-10">
@@ -546,19 +561,19 @@ export default function HomePage() {
                   const Icon = item.icon;
                   return (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{item.label}</h4>
-                        <p className="text-xs text-gray-400">{item.sub}</p>
+                        <h4 className="font-semibold text-gray-900 text-sm">{item.label}</h4>
+                        <p className="text-xs text-gray-600">{item.sub}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <Button asChild size="lg" className="group bg-primary text-gray-900 hover:bg-primary/90">
+              <Button asChild size="lg" className="group bg-primary text-white hover:bg-primary/90">
                 <Link href="/about" className="flex items-center gap-2">
                   Learn More
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -580,11 +595,11 @@ export default function HomePage() {
                 target.src = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80";
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/40 to-transparent lg:from-gray-900/20"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent lg:from-black/20"></div>
             <div className="absolute bottom-0 left-0 right-0 p-8">
-              <div className="inline-flex items-center gap-2 bg-gray-900/80 backdrop-blur-md rounded-xl px-5 py-3 border border-primary/20">
+              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-xl px-5 py-3 border border-primary/30 shadow-lg">
                 <Sparkles className="h-5 w-5 text-primary" />
-                <span className="text-white font-semibold text-sm">REAL DEALS — Trusted Since 2004</span>
+                <span className="text-gray-900 font-semibold text-sm">REAL DEALS — Trusted Since 2004</span>
               </div>
             </div>
           </div>
@@ -630,7 +645,7 @@ export default function HomePage() {
                 <p className="text-muted-foreground mb-6 max-w-xl lg:ml-auto">
                   Be among the first to invest in premium developments in prime locations — modern amenities, innovative designs, and exceptional value.
                 </p>
-                <Button asChild size="lg" className="group bg-primary text-gray-900 hover:bg-primary/90">
+                <Button asChild size="lg" className="group bg-primary text-brand-dark hover:bg-primary/90">
                   <Link href="/properties/under-construction" className="flex items-center gap-2">
                     View All Projects
                     <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -646,31 +661,31 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ─── CTA — Dark with gold accents ─── */}
-      <section className="py-20 md:py-28 bg-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,78,0.12),transparent_60%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(201,168,78,0.08),transparent_60%)]"></div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] border border-primary/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] border border-primary/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      {/* ─── CTA — Light with gold accents ─── */}
+      <section className="py-20 md:py-28 bg-primary/5 relative overflow-hidden border-t border-primary/10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,78,0.15),transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(201,168,78,0.1),transparent_60%)]"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] border border-primary/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] border border-primary/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-4">Get Started Today</p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900">
               Ready to Build Your Property Portfolio?
             </h2>
-            <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
               Whether you&apos;re buying your first home or expanding your investment portfolio, our expert team is here to guide every step.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button asChild size="lg" className="bg-primary text-gray-900 hover:bg-primary/90 group px-8">
+              <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90 group px-8">
                 <Link href="/contact" className="flex items-center gap-2">
                   <Phone className="h-5 w-5" />
                   Contact Us
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-gray-700 text-white hover:bg-gray-800 group px-8">
+              <Button asChild size="lg" variant="outline" className="border-primary/40 text-gray-900 hover:bg-primary/10 group px-8">
                 <a href="https://wa.me/919820590353" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5" />
                   WhatsApp Us
@@ -686,14 +701,14 @@ export default function HomePage() {
               ].map((card, i) => {
                 const Icon = card.icon;
                 return (
-                  <div key={i} className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-primary/30 transition-colors duration-300">
+                  <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-primary/20 hover:border-primary/40 transition-colors duration-300 shadow-sm">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <h3 className="text-base font-bold text-white">{card.title}</h3>
+                      <h3 className="text-base font-bold text-gray-900">{card.title}</h3>
                     </div>
-                    <p className="text-gray-400 text-sm">{card.desc}</p>
+                    <p className="text-gray-600 text-sm">{card.desc}</p>
                   </div>
                 );
               })}
