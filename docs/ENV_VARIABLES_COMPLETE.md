@@ -45,11 +45,17 @@ TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_PHONE_NUMBER=+1234567890
 
 # ============================================
-# CLOUDINARY (Image Storage) - NEW!
+# LOCAL UPLOADS (Image Storage - Default)
 # ============================================
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
+# Optional: Custom path for uploads (default: public/uploads)
+# UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/uploads
+
+# ============================================
+# CLOUDINARY (Image Storage - Optional, not used with local uploads)
+# ============================================
+# CLOUDINARY_CLOUD_NAME=your-cloud-name
+# CLOUDINARY_API_KEY=your-api-key
+# CLOUDINARY_API_SECRET=your-api-secret
 ```
 
 ---

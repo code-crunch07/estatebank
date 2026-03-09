@@ -62,7 +62,7 @@ Thumbs.db
 *.bak
 package-lock-backup.json
 
-# Uploads / user content (if stored locally)
-/uploads/
-/public/uploads/
+# Uploads / user content (keep directory, ignore uploaded files)
+/public/uploads/*
+!/public/uploads/.gitkeep
 

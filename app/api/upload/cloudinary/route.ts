@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { uploadBase64ToCloudinary } from '@/lib/cloudinary';
+import { NextRequest } from 'next/server';
+import { uploadBase64ToLocal } from '@/lib/upload-local';
 import { errorResponse, successResponse } from '@/lib/api-utils';
 
 /**
  * POST /api/upload/cloudinary
- * Upload base64 image to Cloudinary
+ * Upload base64 image to local storage (public/uploads)
+ * Kept route name for backward compatibility with existing callers
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,14 +21,14 @@ export async function POST(request: NextRequest) {
     }
 
     const folderPath = folder || 'uploads';
-    const cloudinaryUrl = await uploadBase64ToCloudinary(base64, folderPath, publicId);
+    const url = await uploadBase64ToLocal(base64, folderPath, publicId);
 
     return successResponse({
-      url: cloudinaryUrl,
+      url,
       folder: folderPath,
     });
   } catch (error: any) {
-    console.error('Cloudinary upload API error:', error);
+    console.error('Local upload API error:', error);
     return errorResponse(error.message || 'Failed to upload image', 500);
   }
 }
