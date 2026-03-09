@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+
+# Allow important pages
+Allow: /properties
+Allow: /properties/*
+Allow: /about
+Allow: /contact
+Allow: /testimonials
+Allow: /services
+
+# Sitemap
+Sitemap: https://estatebank.in/sitemap.xml
