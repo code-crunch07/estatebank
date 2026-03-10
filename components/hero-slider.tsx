@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getPropertyUrl, formatIndianPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, ArrowRight, Heart, GitCompare, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Property } from "@/lib/data-store";
 import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary-client";
 
@@ -157,145 +157,74 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
           {slides.map((slide, index) => {
             const slideContent = (
               <>
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/50"></div>
+                {/* Gradient overlay from left for text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
                 
-                <div className="container relative z-10 mx-auto px-4">
-                  <div className="row">
-                    <div className="col-md-12">
-                      <div className="home-slider-container py-12 md:py-20">
-                        {slide.property ? (
-                          <div className="home-slider-desc max-w-2xl">
-                            <div className="modern-pro-wrap flex gap-3 mb-4">
-                              <span className="property-type bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                {slide.property.status || "For Sale"}
-                              </span>
-                              <span className="property-featured bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                Featured
-                              </span>
-                            </div>
-                            
-                            <div className="home-slider-title mb-4">
-                              <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-                                <Link href={getPropertyUrl(slide.property)} className="hover:text-primary transition-colors">
-                                  {slide.property.name}
-                                </Link>
-                              </h3>
-                              <span className="text-white/90 flex items-center gap-2">
-                                <MapPin className="h-5 w-5" />
-                                {slide.property.location}
-                              </span>
-                            </div>
-                            
-                            <div className="slide-property-info mb-4">
-                              <ul className="flex flex-wrap gap-4 text-white">
-                                <li className="flex items-center gap-2">
-                                  <Bed className="h-5 w-5" />
-                                  Beds: {slide.property.bedrooms}
-                                </li>
-                                <li className="flex items-center gap-2">
-                                  <Bath className="h-5 w-5" />
-                                  Bath: {slide.property.bathrooms}
-                                </li>
-                                <li className="flex items-center gap-2">
-                                  <Square className="h-5 w-5" />
-                                  sqft: {slide.property.area}
-                                </li>
-                              </ul>
-                            </div>
-                            
-                            <div className="listing-price-with-compare flex items-center justify-between mb-6">
-                              <h4 className="list-pr text-3xl md:text-4xl font-bold text-white">
-                                {formatIndianPrice(slide.property.price)}
-                              </h4>
-                              <div className="lpc-right flex items-center gap-2">
-                                <Link 
-                                  href="/compare-property" 
-                                  className="w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
-                                >
-                                  <GitCompare className="h-5 w-5" />
-                                </Link>
-                                <Link 
-                                  href="#" 
-                                  className="w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
-                                >
-                                  <Heart className="h-5 w-5" />
-                                </Link>
-                              </div>
-                            </div>
-                            
-                            <Link href={getPropertyUrl(slide.property)}>
-                              <Button className="read-more bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg flex items-center gap-2">
-                                View Details <ArrowRight className="h-4 w-4" />
+                <div className="container relative z-10 mx-auto px-4 h-full flex items-center">
+                  <div className="max-w-2xl">
+                    {slide.property ? (
+                      <div className="space-y-4">
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                          <Link href={getPropertyUrl(slide.property)} className="hover:text-primary transition-colors">
+                            {slide.property.name}
+                          </Link>
+                        </h2>
+                        <p className="text-lg md:text-xl text-white/90">
+                          {slide.property.location} &bull; {formatIndianPrice(slide.property.price)}
+                        </p>
+                        <Link href={getPropertyUrl(slide.property)}>
+                          <Button className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-6 rounded-xl text-base font-semibold flex items-center gap-2 shadow-xl">
+                            View Details <ArrowRight className="h-5 w-5" />
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {(slide.title && slide.title.trim()) || (slide.description && slide.description.trim()) || (slide.buttonText && slide.buttonText.trim()) ? (
+                          <>
+                            {slide.title && slide.title.trim() && (
+                              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                                {slide.linkUrl ? (
+                                  <Link href={slide.linkUrl} className="hover:text-primary transition-colors">
+                                    {slide.title}
+                                  </Link>
+                                ) : (
+                                  slide.title
+                                )}
+                              </h2>
+                            )}
+                            {slide.description && slide.description.trim() && (
+                              <p className="text-lg md:text-xl text-white/90 max-w-xl">
+                                {slide.description}
+                              </p>
+                            )}
+                            {slide.buttonText && slide.buttonText.trim() && (
+                              <Link href={slide.linkUrl || "/properties"}>
+                                <Button className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-6 rounded-xl text-base font-semibold flex items-center gap-2 shadow-xl">
+                                  {slide.buttonText} <ArrowRight className="h-5 w-5" />
+                                </Button>
+                              </Link>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                              <Link href="/properties" className="hover:text-primary transition-colors">
+                                Find Your Dream Property
+                              </Link>
+                            </h2>
+                            <p className="text-lg md:text-xl text-white/90 max-w-xl">
+                              Premium properties in Mumbai. Residential, commercial, and under-construction listings for sale and rent.
+                            </p>
+                            <Link href="/properties">
+                              <Button className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-6 rounded-xl text-base font-semibold flex items-center gap-2 shadow-xl">
+                                Explore Properties <ArrowRight className="h-5 w-5" />
                               </Button>
                             </Link>
-                          </div>
-                        ) : (
-                          <div className="home-slider-desc max-w-2xl">
-                            {(slide.title && slide.title.trim()) || (slide.description && slide.description.trim()) || (slide.buttonText && slide.buttonText.trim()) ? (
-                              <>
-                                {slide.title && slide.title.trim() && (
-                                  <div className="home-slider-title mb-4">
-                                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-                                      {slide.linkUrl ? (
-                                        <Link href={slide.linkUrl} className="hover:text-primary transition-colors">
-                                          {slide.title}
-                                        </Link>
-                                      ) : (
-                                        slide.title
-                                      )}
-                                    </h3>
-                                  </div>
-                                )}
-                                
-                                {slide.description && slide.description.trim() && (
-                                  <p className="text-lg md:text-xl text-white/90 mb-6">
-                                    {slide.description}
-                                  </p>
-                                )}
-                                
-                                {slide.buttonText && slide.buttonText.trim() && (
-                                  <Link href={slide.linkUrl || "/properties"}>
-                                    <Button className="read-more bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg flex items-center gap-2">
-                                      {slide.buttonText} <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                  </Link>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                <div className="modern-pro-wrap flex gap-3 mb-4">
-                                  <span className="property-type bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                    For Sale
-                                  </span>
-                                  <span className="property-featured bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    Featured
-                                  </span>
-                                </div>
-                                
-                                <div className="home-slider-title mb-4">
-                                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-                                    <Link href="/properties" className="hover:text-primary transition-colors">
-                                      Find Your Dream Property
-                                    </Link>
-                                  </h3>
-                                  <span className="text-white/90 flex items-center gap-2">
-                                    <MapPin className="h-5 w-5" />
-                                    Premium Properties Available
-                                  </span>
-                                </div>
-                                
-                                <Link href="/properties">
-                                  <Button className="read-more bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg flex items-center gap-2">
-                                    Explore Properties <ArrowRight className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                              </>
-                            )}
-                          </div>
+                          </>
                         )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -309,7 +238,7 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
             
             return (
               <div key={index} className="embla__slide flex-[0_0_100%] min-w-0 relative">
-                <div className="flex items-center relative min-h-[600px] md:min-h-[700px] w-full overflow-hidden">
+                <div className="flex items-center relative min-h-[500px] md:min-h-[600px] w-full overflow-hidden">
                   {isFirstSlide ? (
                     // Use Next.js Image for first slide (LCP element)
                     <Image
@@ -341,43 +270,43 @@ export function HeroSlider({ properties, images = [], bannerLinks = [], bannerSl
         </div>
       </div>
       
-      {/* Navigation Arrows */}
+      {/* Pagination — bottom-left: horizontal bars (active = accent, inactive = grey) */}
       {slides.length > 1 && (
-        <>
-          <button
-            onClick={scrollPrev}
-            disabled={!canScrollPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
-        </>
-      )}
-
-      {/* Dots indicator */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">
+        <div className="absolute bottom-8 left-8 md:left-12 z-20 flex items-center gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`h-1 rounded-full transition-all ${
                 index === selectedIndex 
-                  ? "bg-white w-8" 
-                  : "bg-white/50 hover:bg-white/75"
+                  ? "bg-primary w-8" 
+                  : "bg-white/40 hover:bg-white/60 w-4"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
+        </div>
+      )}
+
+      {/* Navigation Arrows — bottom-right: rounded squares */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-8 right-8 md:right-12 z-20 flex gap-2">
+          <button
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            className="w-12 h-12 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            className="w-12 h-12 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
       )}
     </div>

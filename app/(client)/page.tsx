@@ -6,11 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { HeroSlider } from "@/components/hero-slider";
 import { DataStore, type Property, type HeroImage } from "@/lib/data-store";
-import { Search, MapPin, TrendingUp, Users, Award, Home, Building2, ArrowRight, Phone, MessageSquare, CheckCircle2, Calendar, Handshake, BadgeCheck, Bed, IndianRupee, Shield, Star, Clock, Sparkles } from "lucide-react";
+import { TrendingUp, Users, Award, Home, Building2, ArrowRight, Phone, MessageSquare, CheckCircle2, Calendar, Handshake, BadgeCheck, Shield, Star, Clock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { HeroSliderSkeleton } from "@/components/skeletons/hero-slider-skeleton";
 
 // Dynamic imports for non-critical components (code splitting)
@@ -60,18 +57,7 @@ interface HeroImageApi {
 export default function HomePage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [heroImages, setHeroImages] = useState<HeroImageApi[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("all");
-  const [selectedType, setSelectedType] = useState("all");
-  const [selectedPrice, setSelectedPrice] = useState("all");
-  const [selectedBedrooms, setSelectedBedrooms] = useState("all");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     // Fetch properties and hero images in parallel for better performance
@@ -172,14 +158,6 @@ export default function HomePage() {
     
     // Removed automatic refresh interval - data will refresh on page reload or navigation
     // This reduces unnecessary API calls and improves performance
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const defaultHeroImage = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80";
@@ -325,33 +303,6 @@ export default function HomePage() {
     { icon: Award, value: "20+", label: "Years Experience", color: "text-orange-600", bg: "bg-orange-100" },
   ];
 
-  // Get unique locations and types for filters
-  const uniqueLocations = [...new Set(properties.map(p => p.location))].filter(Boolean).sort();
-  const uniqueTypes = [...new Set(properties.map(p => p.type))].filter(Boolean).sort();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    
-    if (searchQuery.trim()) {
-      params.set("search", searchQuery.trim());
-    }
-    if (selectedLocation !== "all") {
-      params.set("location", selectedLocation);
-    }
-    if (selectedType !== "all") {
-      params.set("type", selectedType);
-    }
-    if (selectedPrice !== "all") {
-      params.set("price", selectedPrice);
-    }
-    if (selectedBedrooms !== "all") {
-      params.set("bedrooms", selectedBedrooms);
-    }
-    
-    window.location.href = `/properties?${params.toString()}`;
-  };
-
   const trustPoints = [
     { icon: Shield, title: "Verified Properties", desc: "Every listing inspected by our expert team" },
     { icon: TrendingUp, title: "Investment Growth", desc: "Strategic picks for maximum returns" },
@@ -384,110 +335,6 @@ export default function HomePage() {
           allSlides={[{ property: null, image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80" }]}
         />
       )}
-
-      {/* ─── Search Bar — light floating card ─── */}
-      <section className="relative -mt-10 md:-mt-20 z-30 mb-0">
-        <div className="container mx-auto px-4">
-          <Card className="shadow-2xl border border-gray-200/80 bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden">
-            <form onSubmit={handleSearch} className="p-4 md:p-6">
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-3">
-                  <div className="flex-1 relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
-                    <Input
-                      type="text"
-                      placeholder="Search by location, property name, or features..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-base bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-500 focus:border-primary focus:bg-white rounded-xl transition-all"
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="h-14 px-8 rounded-xl text-base font-semibold shadow-lg hover:shadow-xl transition-all bg-primary text-white hover:bg-primary/90"
-                  >
-                    <Search className="mr-2 h-5 w-5" />
-                    Search
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {isMounted ? (
-                    <>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                        <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
-                            <SelectValue placeholder="Location" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Locations</SelectItem>
-                            {uniqueLocations.map((location) => (
-                              <SelectItem key={location} value={location}>{location}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                        <Select value={selectedType} onValueChange={setSelectedType}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
-                            <SelectValue placeholder="Type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Types</SelectItem>
-                            {uniqueTypes.map((type) => (
-                              <SelectItem key={type} value={type}>{type}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="relative">
-                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                        <Select value={selectedPrice} onValueChange={setSelectedPrice}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
-                            <SelectValue placeholder="Price Range" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Any Price</SelectItem>
-                            <SelectItem value="below-1">Below ₹1 Cr</SelectItem>
-                            <SelectItem value="1-3">₹1 Cr - ₹3 Cr</SelectItem>
-                            <SelectItem value="3-5">₹3 Cr - ₹5 Cr</SelectItem>
-                            <SelectItem value="above-5">Above ₹5 Cr</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="relative">
-                        <Bed className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                        <Select value={selectedBedrooms} onValueChange={setSelectedBedrooms}>
-                          <SelectTrigger className="h-12 pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl transition-all [&>span]:text-gray-700 focus:bg-white focus:border-primary" suppressHydrationWarning>
-                            <SelectValue placeholder="Bedrooms" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Any BHK</SelectItem>
-                            <SelectItem value="1">1 BHK</SelectItem>
-                            <SelectItem value="2">2 BHK</SelectItem>
-                            <SelectItem value="3">3 BHK</SelectItem>
-                            <SelectItem value="4">4 BHK</SelectItem>
-                            <SelectItem value="5">5+ BHK</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-12 bg-gray-200 rounded-xl animate-pulse" />
-                      ))}
-                    </>
-                  )}
-                </div>
-              </div>
-            </form>
-          </Card>
-        </div>
-      </section>
 
       {/* ─── Trust Bar ─── */}
       <section className="py-14 md:py-20 bg-white">
