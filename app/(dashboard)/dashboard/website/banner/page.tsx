@@ -536,6 +536,17 @@ function HeroImageForm({
     }
   };
 
+  const uploadImageToStorage = async (base64: string): Promise<string> => {
+    const res = await fetch('/api/upload/cloudinary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, folder: 'hero-images' }),
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.data.url;
+  };
+
   const handleRemoveImage = () => {
     setSelectedFile(null);
     setPreview(null);
@@ -543,7 +554,7 @@ function HeroImageForm({
     setFormData((prev) => ({ ...prev, image: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.type === "property" && !formData.propertyId) {
       toast.error("Please select a property");
@@ -553,7 +564,15 @@ function HeroImageForm({
       toast.error("Please upload a banner image");
       return;
     }
-    onSave(formData);
+    let imageUrl = formData.image;
+    if (formData.image?.startsWith('data:image')) {
+      try {
+        imageUrl = await uploadImageToStorage(formData.image);
+      } catch {
+        toast.error("Failed to upload image, saving with base64");
+      }
+    }
+    onSave({ ...formData, image: imageUrl || formData.image });
   };
 
   return (

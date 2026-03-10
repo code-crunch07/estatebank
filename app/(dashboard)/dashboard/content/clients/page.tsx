@@ -314,20 +314,39 @@ function ClientForm({
     }
   };
 
+  const uploadImageToStorage = async (base64: string): Promise<string> => {
+    const res = await fetch('/api/upload/cloudinary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, folder: 'clients/logos' }),
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.data.url;
+  };
+
   const handleRemoveImage = () => {
     setSelectedFile(null);
     setPreview("");
     setFormData({ ...formData, logo: "/logo.png" });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Validate that logo is provided
     if (!formData.logo || formData.logo === "/logo.png" || formData.logo.trim() === "") {
       toast.error("Please upload a logo or enter a logo URL");
       return;
     }
-    onSave(formData);
+    let logoUrl = formData.logo;
+    if (formData.logo?.startsWith('data:image')) {
+      try {
+        logoUrl = await uploadImageToStorage(formData.logo);
+      } catch {
+        toast.error("Failed to upload logo, saving with base64");
+      }
+    }
+    onSave({ ...formData, logo: logoUrl || formData.logo });
   };
 
   return (

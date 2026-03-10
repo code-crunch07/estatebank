@@ -502,13 +502,24 @@ function TeamMemberForm({
     }
   };
 
+  const uploadImageToStorage = async (base64: string): Promise<string> => {
+    const res = await fetch('/api/upload/cloudinary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, folder: 'team-members' }),
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.data.url;
+  };
+
   const handleRemoveImage = () => {
     setSelectedFile(null);
     setImagePreview(null);
     setFormData((prev) => ({ ...prev, image: "/team/default.jpg" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.role) {
       toast.error("Please fill in all required fields");
@@ -527,6 +538,15 @@ function TeamMemberForm({
       }
     }
 
+    let imageUrl = formData.image;
+    if (formData.image?.startsWith('data:image')) {
+      try {
+        imageUrl = await uploadImageToStorage(formData.image);
+      } catch {
+        toast.error("Failed to upload image, saving with base64");
+      }
+    }
+
     onSave({
       name: formData.name,
       email: formData.email,
@@ -534,7 +554,7 @@ function TeamMemberForm({
       role: formData.role,
       department: formData.department,
       location: formData.location,
-      image: formData.image,
+      image: imageUrl || formData.image,
       bio: formData.bio,
       socials: {
         linkedin: formData.linkedin || undefined,

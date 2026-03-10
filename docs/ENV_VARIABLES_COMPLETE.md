@@ -47,8 +47,15 @@ TWILIO_PHONE_NUMBER=+1234567890
 # ============================================
 # LOCAL UPLOADS (Image Storage - Default)
 # ============================================
-# Optional: Custom path for uploads (default: public/uploads)
-# UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/uploads
+# All images (properties, team, testimonials, hero slider, clients, branding, areas)
+# are saved to the uploads folder. Default: {project_root}/public/uploads
+# Images are served at /uploads/{folder}/{filename}
+#
+# Optional: Custom path (use full path for CloudPanel/server deployment)
+# UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/public/uploads
+#
+# Upload folders: properties/featured, properties/gallery, properties/floor-plans,
+# team-members, testimonials, hero-images, clients/logos, branding, homepage-areas
 
 # ============================================
 # CLOUDINARY (Image Storage - Optional, not used with local uploads)

@@ -297,15 +297,36 @@ export default function BrandingPage() {
     });
   };
 
+  const uploadImageToStorage = async (base64: string, folder: string): Promise<string> => {
+    const res = await fetch('/api/upload/cloudinary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, folder }),
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.data.url;
+  };
+
   const handleSave = async () => {
     if (!settings) return;
     
     setIsSaving(true);
     try {
+      let payload = { ...settings };
+      if (settings.headerLogo?.startsWith('data:image')) {
+        payload.headerLogo = await uploadImageToStorage(settings.headerLogo, 'branding');
+      }
+      if (settings.dashboardLogo?.startsWith('data:image')) {
+        payload.dashboardLogo = await uploadImageToStorage(settings.dashboardLogo, 'branding');
+      }
+      if (settings.favicon?.startsWith('data:image')) {
+        payload.favicon = await uploadImageToStorage(settings.favicon, 'branding');
+      }
       const response = await fetch('/api/branding', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
       const data = await response.json();
       if (data.success) {

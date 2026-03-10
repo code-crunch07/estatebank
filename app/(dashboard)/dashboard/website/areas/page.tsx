@@ -379,6 +379,22 @@ function AreaForm({
 
   const saveArea = async (imageUrl: string) => {
     try {
+      let finalImageUrl = imageUrl;
+      if (imageUrl?.startsWith('data:image')) {
+        try {
+          const res = await fetch('/api/upload/cloudinary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64: imageUrl, folder: 'homepage-areas' }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            finalImageUrl = data.data.url;
+          }
+        } catch {
+          toast.error("Failed to upload image");
+        }
+      }
       if (area) {
         // Update existing area
         const response = await fetch(`/api/homepage-areas/${area._id}`, {
@@ -387,7 +403,7 @@ function AreaForm({
           body: JSON.stringify({
             name: formData.name,
             description: formData.description,
-            image: imageUrl,
+            image: finalImageUrl,
             link: formData.link,
             order: formData.order,
             status: formData.status,
@@ -408,7 +424,7 @@ function AreaForm({
           body: JSON.stringify({
             name: formData.name,
             description: formData.description || undefined,
-            image: imageUrl,
+            image: finalImageUrl,
             link: formData.link || undefined,
             order: formData.order,
             status: formData.status,
