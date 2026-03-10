@@ -39,6 +39,15 @@ const nextConfig = {
   // Compression and performance optimizations
   compress: true,
   poweredByHeader: false,
+  // Serve /uploads/* via API when static file 404s (handles UPLOAD_PATH outside public, standalone build)
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
+      },
+    ];
+  },
   // Add headers for font loading and performance
   async headers() {
     return [

@@ -53,3 +53,30 @@ Or for custom path:
 ```bash
 mkdir -p /home/estatebanknew/htdocs/estatebank.in/public/uploads
 ```
+
+## Troubleshooting 404 errors
+
+If images return 404:
+
+1. **Check UPLOAD_PATH** – Ensure `.env` has the correct path:
+   ```env
+   UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/uploads
+   ```
+   Or use default (omit UPLOAD_PATH): `public/uploads`
+
+2. **Verify files exist** – On the server:
+   ```bash
+   ls -la /home/estatebanknew/htdocs/estatebank.in/uploads/properties/gallery/
+   ```
+
+3. **Copy uploads if missing** – If files were uploaded locally, copy to the server:
+   ```bash
+   scp -r public/uploads/* user@server:/home/estatebanknew/htdocs/estatebank.in/public/uploads/
+   ```
+
+4. **Permissions** – Ensure the app can read the uploads directory:
+   ```bash
+   chmod -R 755 /path/to/uploads
+   ```
+
+5. **Serve via API** – `/uploads/*` is served via `/api/uploads/*` so files in UPLOAD_PATH are served even when outside `public/`.
