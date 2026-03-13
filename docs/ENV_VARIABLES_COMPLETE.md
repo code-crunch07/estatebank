@@ -52,7 +52,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 # Images are served at /uploads/{folder}/{filename}
 #
 # Optional: Custom path (use full path for CloudPanel/server deployment)
-# UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/public/uploads
+# UPLOAD_PATH=/home/estatebanknew/htdocs/estatebank.in/estate-uploads/public
 #
 # Upload folders: properties/featured, properties/gallery, properties/floor-plans,
 # team-members, testimonials, hero-images, clients/logos, branding, homepage-areas
