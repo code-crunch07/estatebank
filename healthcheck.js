@@ -2,7 +2,8 @@ const http = require('http');
 
 const options = {
   hostname: 'localhost',
-  port: process.env.PORT || 3000,
+  // Dockerfile and docker-compose set PORT=3002
+  port: process.env.PORT || 3002,
   path: '/api/health',
   method: 'GET',
   timeout: 5000

@@ -66,3 +66,6 @@ package-lock-backup.json
 /public/uploads/*
 !/public/uploads/.gitkeep
 
+# Docker compose default bind mount (UPLOADS_HOST_PATH)
+/data/uploads/
+

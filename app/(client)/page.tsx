@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { HeroSlider } from "@/components/hero-slider";
 import { DataStore, type Property, type HeroImage } from "@/lib/data-store";
-import { TrendingUp, Users, Award, Home, Building2, ArrowRight, Phone, MessageSquare, CheckCircle2, Calendar, Handshake, BadgeCheck, Shield, Star, Clock, Sparkles } from "lucide-react";
+import { TrendingUp, Users, Award, Home, Building2, ArrowRight, Phone, MessageSquare, CheckCircle2, Calendar, Handshake, BadgeCheck, Shield, Star, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroSliderSkeleton } from "@/components/skeletons/hero-slider-skeleton";
 
@@ -384,21 +384,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── About — Split: light left, image right ─── */}
-      <section className="py-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-          {/* Left — Light panel */}
-          <div className="bg-gray-50 text-gray-900 flex items-center border-r border-gray-200">
-            <div className="px-8 md:px-16 lg:px-20 py-16 lg:py-20 max-w-xl">
-              <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-4">About EstateBANK.in</p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-gray-900">
+      {/* ─── About — Split: content + office image (Figtree body, Forum heading) ─── */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-white to-muted/30 py-16 md:py-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_0%_50%,rgba(201,168,78,0.08),transparent)]" />
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 items-stretch gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xl shadow-black/[0.06] lg:grid-cols-2 lg:rounded-3xl lg:min-h-[560px]">
+            {/* Copy — order below image on small screens for stronger hero photo */}
+            <div className="relative order-2 flex flex-col justify-center border-t border-border/60 bg-gradient-to-br from-background via-primary/[0.04] to-muted/40 px-6 py-12 sm:px-10 md:px-14 lg:order-1 lg:border-t-0 lg:border-r lg:py-16">
+              <div className="mb-5 flex items-center gap-3">
+                <span className="h-px w-8 bg-primary/60" aria-hidden />
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                  About EstateBANK.in
+                </p>
+              </div>
+              <h2 className="font-heading text-3xl font-bold leading-[1.15] tracking-tight text-foreground md:text-4xl lg:text-[2.35rem]">
                 Building Wealth Through Property Since 2004
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                What started as a single-handed project by <span className="text-gray-900 font-semibold">Mr. Pankaj Nagpal</span> has grown into one of Mumbai&apos;s most trusted real estate agencies. Associated with <span className="text-gray-900 font-semibold">CREBAI India</span>, we bring two decades of market expertise to every deal.
+              <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-[1.05rem]">
+                What started as a single-handed project by{" "}
+                <span className="font-semibold text-foreground">Mr. Pankaj Nagpal</span> has grown into one of
+                Mumbai&apos;s most trusted real estate agencies. Associated with{" "}
+                <span className="font-semibold text-foreground">CREBAI India</span>, we bring two decades of market
+                expertise to every deal.
               </p>
 
-              <div className="grid grid-cols-2 gap-x-8 gap-y-6 mb-10">
+              <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 {[
                   { icon: Calendar, label: "20+ Years", sub: "Of Excellence" },
                   { icon: Handshake, label: "CREBAI", sub: "Certified Member" },
@@ -407,46 +417,62 @@ export default function HomePage() {
                 ].map((item, i) => {
                   const Icon = item.icon;
                   return (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                        <Icon className="h-5 w-5 text-primary" />
+                    <li
+                      key={i}
+                      className="group flex gap-3 rounded-xl border border-primary/10 bg-background/80 p-3.5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md"
+                    >
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/15 transition group-hover:bg-primary/18">
+                        <Icon className="h-5 w-5 text-primary" aria-hidden />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-sm">{item.label}</h4>
-                        <p className="text-xs text-gray-600">{item.sub}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold leading-tight text-foreground">{item.label}</p>
+                        <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{item.sub}</p>
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
+              </ul>
+
+              <div className="mt-10">
+                <Button
+                  asChild
+                  size="lg"
+                  className="group rounded-xl bg-primary px-8 text-primary-foreground shadow-lg shadow-primary/25 transition hover:bg-primary/90"
+                >
+                  <Link href="/about" className="flex items-center gap-2">
+                    Learn More
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
               </div>
-
-              <Button asChild size="lg" className="group bg-primary text-white hover:bg-primary/90">
-                <Link href="/about" className="flex items-center gap-2">
-                  Learn More
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
             </div>
-          </div>
 
-          {/* Right — Full-bleed image */}
-          <div className="relative min-h-[400px] lg:min-h-0">
-            <Image
-              src="/office.jpg"
-              alt="EstateBANK.in Office"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80";
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent lg:from-black/20"></div>
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-xl px-5 py-3 border border-primary/30 shadow-lg">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <span className="text-gray-900 font-semibold text-sm">REAL DEALS — Trusted Since 2004</span>
+            {/* Image — subtle frame + trust chip */}
+            <div className="relative order-1 min-h-[280px] sm:min-h-[360px] lg:order-2 lg:min-h-0">
+              <Image
+                src="/office.jpg"
+                alt="EstateBANK.in office"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                priority={false}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80";
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+                <div className="inline-flex max-w-[min(100%,20rem)] items-start gap-3 rounded-2xl border border-white/25 bg-white/92 px-4 py-3 shadow-2xl backdrop-blur-md sm:items-center sm:gap-3 sm:px-5 sm:py-3.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/25">
+                    <Star className="h-5 w-5 fill-primary/30 text-primary" aria-hidden />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Real Deals</p>
+                    <p className="text-sm font-semibold leading-snug text-foreground">Trusted since 2004</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -16,6 +16,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
+      # Inside the container uploads must live under /app — do NOT pass host paths from .env here.
+      # Mount your host folder to /app/public/uploads (see volumes below).
+      - UPLOAD_PATH=/app/public/uploads
       - MONGODB_URI=${MONGODB_URI:-mongodb://admin:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DATABASE:-estatebank}?authSource=admin}
       - JWT_SECRET=${JWT_SECRET}
       - BREVO_SMTP_HOST=${BREVO_SMTP_HOST}
@@ -33,6 +36,9 @@ services:
       - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
     env_file:
       - .env
+    # Persist uploads: set UPLOADS_HOST_PATH in .env to your server path, or use default ./data/uploads
+    volumes:
+      - ${UPLOADS_HOST_PATH:-./data/uploads}:/app/public/uploads
     networks:
       - estatebank-network
     healthcheck:

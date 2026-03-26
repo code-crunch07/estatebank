@@ -44,6 +44,9 @@ if [ -d .git ]; then
     git pull || echo "⚠️  Git pull failed, continuing with current code..."
 fi
 
+# Upload dir for bind mount (see docker-compose.yml volumes / UPLOADS_HOST_PATH)
+mkdir -p ./data/uploads
+
 # Build Docker image
 echo "🔨 Building Docker image..."
 docker compose build --no-cache
@@ -70,6 +73,8 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         echo -e "${GREEN}✅ Application is running!${NC}"
         echo ""
         echo "🌐 Application URL: http://localhost:3002 (estatebank.in)"
+        echo "🏥 Health: curl -sf http://localhost:3002/api/health"
+        echo "📁 Uploads: container uses /app/public/uploads — set UPLOADS_HOST_PATH in .env to bind a host folder; chown to 1001:1001 for the nextjs user"
         echo "📊 View logs: docker compose logs -f app"
         echo "🛑 Stop application: docker compose down"
         exit 0
