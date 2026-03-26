@@ -508,7 +508,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <div className="-mx-4 mt-auto flex min-h-[52px] w-[calc(100%+2rem)] overflow-hidden border-t border-border">
             <Link
               href={getPropertyUrl(property)}
-              className="flex min-h-[52px] min-w-[38%] max-w-[46%] shrink-0 items-center justify-center bg-primary px-3 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-primary-foreground sm:text-[11px]"
+              className="relative z-10 flex min-h-[52px] min-w-[38%] max-w-[46%] shrink-0 items-center justify-center bg-primary px-3 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-primary-foreground sm:text-[11px]"
               style={{
                 clipPath: "polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%)",
               }}
@@ -516,7 +516,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             >
               {isRent ? "FOR RENT" : "VIEW DETAILS"}
             </Link>
-            <div className="relative flex min-h-[52px] flex-1 items-center justify-end bg-zinc-900 px-3 py-2 text-right text-xs font-bold text-white sm:text-sm -ml-2">
+            <div className="relative flex min-h-[52px] flex-1 items-center justify-end bg-zinc-900 px-3 py-2 pl-10 text-right text-xs font-bold text-white sm:text-sm -ml-4 before:absolute before:left-0 before:top-0 before:h-full before:w-6 before:bg-zinc-900">
               <span className="line-clamp-2">{formatIndianPrice(property.price)}</span>
             </div>
           </div>
