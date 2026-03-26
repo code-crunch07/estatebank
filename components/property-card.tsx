@@ -504,14 +504,21 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
           </div>
 
-          {/* Price row (strip UI removed) */}
-          <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-3 py-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-              {isRent ? "For rent" : "View details"}
-            </span>
-            <span className="text-sm font-bold text-foreground">
-              {formatIndianPrice(property.price)}
-            </span>
+          {/* Price strip (website-style): primary left + dark right, diagonal separator */}
+          <div className="-mx-4 mt-auto flex min-h-[52px] w-[calc(100%+2rem)] overflow-hidden border-t border-border">
+            <Link
+              href={getPropertyUrl(property)}
+              className="flex min-h-[52px] min-w-[38%] max-w-[46%] shrink-0 items-center justify-center bg-primary px-3 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-primary-foreground sm:text-[11px]"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%)",
+              }}
+              aria-label="View property details"
+            >
+              {isRent ? "FOR RENT" : "VIEW DETAILS"}
+            </Link>
+            <div className="relative flex min-h-[52px] flex-1 items-center justify-end bg-zinc-900 px-3 py-2 text-right text-xs font-bold text-white sm:text-sm -ml-2">
+              <span className="line-clamp-2">{formatIndianPrice(property.price)}</span>
+            </div>
           </div>
         </CardContent>
       </Card>
