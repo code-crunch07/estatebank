@@ -640,29 +640,34 @@ export default function PropertyDetailPage() {
           baseUrl={process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://estatebank.in')}
         />
       )}
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-7xl w-full overflow-x-hidden">
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto max-w-7xl w-full overflow-x-hidden px-4 py-6 md:py-10">
           {/* Header Section: Location, Title, Price, Share */}
-          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
+          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 rounded-2xl border border-border bg-card p-5 md:p-7 shadow-sm">
+            <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
+              <Link href="/properties" className="hover:text-primary transition-colors">Properties</Link>
+              <span className="mx-2">/</span>
+              <span className="capitalize">{segment}</span>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               {/* Left Side: Location and Title */}
               <div className="flex-1">
                 {/* Location */}
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                  <div className="p-1.5 bg-primary/10 rounded-lg">
+                <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="rounded-lg bg-primary/10 p-1.5">
                     <MapPin className="h-4 w-4 text-primary" />
                   </div>
                   <span className="font-medium">{property.location}</span>
                   {property.address && (
                     <>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-500">{property.address}</span>
+                      <span className="text-muted-foreground/60">•</span>
+                      <span className="text-muted-foreground">{property.address}</span>
                     </>
                   )}
                 </div>
                 
                 {/* Property Title */}
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 text-left leading-tight mb-4">
+                <h1 className="mb-2 text-left font-heading text-3xl font-bold leading-tight text-foreground md:text-5xl">
                   {property.name}
                 </h1>
                 
@@ -673,7 +678,7 @@ export default function PropertyDetailPage() {
                 {/* Price Section */}
                 <div className="flex flex-col gap-2">
                   <Button
-                    className="px-8 py-4 bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary/95 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 text-lg hover:scale-105 h-auto"
+                    className="h-auto rounded-lg bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90"
                   >
                     <TrendingUp className="h-5 w-5 mr-2" />
                     {formatIndianPrice(property.price)}
@@ -692,7 +697,7 @@ export default function PropertyDetailPage() {
                     variant="outline"
                     size="icon"
                     onClick={handleShare}
-                    className="h-[56px] w-12 rounded-xl hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-md hover:shadow-lg border-2 flex items-center justify-center"
+                    className="h-[56px] w-12 rounded-lg border-2 shadow-sm transition-all duration-300 hover:border-primary hover:bg-primary hover:text-white"
                     title="Share"
                   >
                     <Share2 className="h-5 w-5" />
@@ -703,12 +708,12 @@ export default function PropertyDetailPage() {
           </div>
 
           {/* Main Content: Image Gallery and Property Details Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+          <div className="mb-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
             {/* Left Column: Image Gallery with Thumbnails */}
-            <div className="lg:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 lg:col-span-8">
               <div className="w-full">
                 {/* Main Image */}
-                <div className="relative w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 min-h-[500px] md:min-h-[600px] group">
+                <div className="group relative w-full min-h-[420px] overflow-hidden rounded-xl border border-border bg-muted shadow-md transition-all duration-300 md:min-h-[560px]">
                   {imageLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -750,7 +755,7 @@ export default function PropertyDetailPage() {
                               : propertyImages.length - 1
                           );
                         }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl z-20 hover:scale-110 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                        className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-3 text-foreground opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white group-hover:opacity-100"
                         aria-label="Previous image"
                       >
                         <ChevronLeft className="h-6 w-6" />
@@ -765,7 +770,7 @@ export default function PropertyDetailPage() {
                               : 0
                           );
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl z-20 hover:scale-110 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                        className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-3 text-foreground opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white group-hover:opacity-100"
                         aria-label="Next image"
                       >
                         <ChevronRight className="h-6 w-6" />
@@ -1045,14 +1050,14 @@ export default function PropertyDetailPage() {
             )}
 
             {/* Right Column: Property Details Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-4">
               <div className="lg:sticky lg:top-6 z-20 self-start space-y-4 transition-all duration-300">
                 {/* Property Details Card */}
-                <Card className="rounded-2xl border-2 border-gray-200/50 shadow-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-primary via-primary/95 to-primary/90 p-6 border-b">
+                <Card className="overflow-hidden rounded-xl border border-border bg-card shadow-md">
+                  <CardHeader className="border-b bg-muted/40 p-6">
                     <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
                       <Home className="h-5 w-5" />
-                      Property Details
+                      <span className="text-foreground">Property Details</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-5">

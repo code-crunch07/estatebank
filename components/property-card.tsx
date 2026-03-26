@@ -445,7 +445,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
 
-        <CardContent className="flex flex-1 flex-col gap-3 p-4 pt-4">
+        <CardContent className="flex flex-1 flex-col gap-3 p-4 pt-4 pb-0">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-primary line-clamp-2">
             {categoryLine}
           </p>
