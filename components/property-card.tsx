@@ -15,7 +15,20 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Bed, Eye, MessageSquare, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Car,
+  Maximize2,
+  Eye,
+  MessageSquare,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  User,
+} from "lucide-react";
 import { toast } from "sonner";
 import { getPropertyUrl, formatIndianPrice } from "@/lib/utils";
 import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary-client";
@@ -39,10 +52,47 @@ interface Property {
   featuredImage?: string; // Featured image takes priority
   description?: string;
   segment?: "residential" | "commercial";
+  createdAt?: string;
+  clientName?: string;
+  broker?: string;
+  ownerName?: string;
+  projectArea?: string;
+  carpetArea?: string;
+  propertyType?: string;
+  rent?: string;
+  occupancyType?: string;
 }
 
 interface PropertyCardProps {
   property: Property;
+}
+
+/** Matches dashboard `properties/page.tsx` Badge variant mapping (default / destructive / secondary) */
+function statusBadgeClass(status: string): string {
+  const lower = status.trim().toLowerCase();
+  if (lower === "available" || lower === "completed") {
+    return "bg-primary text-primary-foreground";
+  }
+  if (lower === "sold") {
+    return "bg-destructive text-destructive-foreground";
+  }
+  return "bg-secondary text-secondary-foreground";
+}
+
+function formatRelativePosted(iso?: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const diffSec = Math.max(0, (Date.now() - d.getTime()) / 1000);
+  const years = Math.floor(diffSec / (365.25 * 24 * 3600));
+  if (years >= 1) return `${years} year${years === 1 ? "" : "s"} ago`;
+  const months = Math.floor(diffSec / (30 * 24 * 3600));
+  if (months >= 1) return `${months} month${months === 1 ? "" : "s"} ago`;
+  const days = Math.floor(diffSec / (24 * 3600));
+  if (days >= 1) return `${days} day${days === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(diffSec / 3600);
+  if (hours >= 1) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  return "Recently";
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
@@ -71,36 +121,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
       ? `${property.bedrooms} BHK${property.bedrooms > 1 ? "s" : ""}`
       : "N/A";
   
-  // Get statuses for badges (support both array and single string)
-  const statuses = Array.isArray(property.status) ? property.status : (property.status ? [property.status] : ["Available"]);
-  const primaryStatus = statuses[0] || "Available";
-  const isReadyToMove = ["Ready to Move", "READY TO MOVE", "Completed", "COMPLETED", "Available", "AVAILABLE"].some(
-    (s) => primaryStatus.toLowerCase() === s.toLowerCase()
-  );
-  const statusColors: Record<string, string> = {
-    "New Launch": "bg-slate-700",
-    "NEW LAUNCH": "bg-slate-700",
-    "Under Construction": "bg-slate-700",
-    "UNDER CONSTRUCTION": "bg-slate-700",
-    "Available": "bg-emerald-600",
-    "AVAILABLE": "bg-emerald-600",
-    "Completed": "bg-emerald-600",
-    "COMPLETED": "bg-emerald-600",
-    "Ready to Move": "bg-emerald-600",
-    "READY TO MOVE": "bg-emerald-600",
-    "Hot": "bg-slate-700",
-    "HOT": "bg-slate-700",
-    "Resale": "bg-slate-700",
-    "RESALE": "bg-slate-700",
-    "Near Possession": "bg-slate-700",
-    "NEAR POSSESSION": "bg-slate-700",
-    "Sold": "bg-gray-500",
-    "SOLD": "bg-gray-500",
-    "Reserved": "bg-primary",
-    "RESERVED": "bg-primary",
-    "Coming Soon": "bg-slate-700",
-    "COMING SOON": "bg-slate-700",
-  };
+  // Same source as dashboard: status[] from property (multi-select in add/edit form)
+  const rawStatuses = Array.isArray(property.status)
+    ? property.status.filter(Boolean)
+    : property.status
+      ? [property.status]
+      : [];
+  const statuses = rawStatuses.length > 0 ? rawStatuses : ["Available"];
+  const occupancyLabel = ((property as any).occupancyType as string | undefined)?.trim();
   const yearTag = (property as any).commencementDate || (property as any).dateAvailableFrom || null;
   const yearDisplay = yearTag ? (yearTag.match(/\d{4}/)?.[0] || yearTag) : null;
 
@@ -255,6 +283,36 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const hasMultipleImages = propertyImages.length > 1;
   const displayAddress = property.address || property.location;
 
+  const postedLabel =
+    formatRelativePosted((property as any).createdAt) ||
+    (yearDisplay ? String(yearDisplay) : null);
+  const authorName =
+    (property as any).clientName ||
+    (property as any).broker ||
+    (property as any).ownerName ||
+    "EstateBANK.in";
+  const categoryParts = [
+    (property as any).propertyType,
+    property.type,
+    property.segment,
+  ]
+    .filter(Boolean)
+    .map((s) => String(s).trim().toUpperCase());
+  const categoryLine = [...new Set(categoryParts)].join(", ") || "PROPERTY";
+  const isRent =
+    !!(property as any).rent ||
+    (typeof property.price === "string" && property.price.includes("/month"));
+  const sqftLabel =
+    (property as any).carpetArea ||
+    (property as any).projectArea ||
+    property.area ||
+    "—";
+  const parkingOrExtra =
+    (property as any).parking != null && String((property as any).parking).trim() !== ""
+      ? String((property as any).parking)
+      : (property as any).garage != null && String((property as any).garage).trim() !== ""
+        ? String((property as any).garage)
+        : null;
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -268,22 +326,33 @@ export function PropertyCard({ property }: PropertyCardProps) {
   };
 
 
+  const sqftDisplay =
+    sqftLabel === "—"
+      ? "—"
+      : /sq\.?\s*ft|ft²|sqft|sq\.ft/i.test(String(sqftLabel))
+        ? String(sqftLabel)
+        : `${sqftLabel} SqFt`;
+  const fourthSpec =
+    parkingOrExtra != null
+      ? `${parkingOrExtra} ${/^\d+$/.test(String(parkingOrExtra).trim()) ? "Garage" : ""}`.trim()
+      : String((property as any).propertyType || property.type || "—");
+
   return (
     <>
       <Card 
-        className="overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 rounded-lg bg-white border border-gray-200 shadow-lg h-full flex flex-col group cursor-pointer"
+        className="overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 rounded-lg bg-card border border-border shadow-md h-full flex flex-col group cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image Section */}
-        <div className="relative h-56 w-full overflow-hidden bg-gray-100">
+        <div className="relative h-60 w-full overflow-hidden bg-muted">
           <Link href={getPropertyUrl(property)} className="block h-full w-full">
             <div className="relative h-full w-full">
               <Image
                 src={propertyImage}
                 alt={property.name}
                 fill
-                className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+                className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-105' : 'scale-100'}`}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 unoptimized
                 onError={(e) => {
@@ -291,127 +360,188 @@ export function PropertyCard({ property }: PropertyCardProps) {
                   target.src = "/logo.png";
                 }}
               />
-              
-              {/* Dark overlay on hover */}
-              <div className={`absolute inset-0 bg-black/0 transition-all duration-300 ${isHovered ? 'bg-black/20' : ''}`} />
-              
-              {/* Image counter - Always visible when multiple images */}
+
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-90"}`} />
+
               {hasMultipleImages && (
-                <div className="absolute bottom-3 right-3 bg-black/80 text-white px-3 py-1.5 rounded-full text-xs font-semibold z-20 backdrop-blur-sm">
+                <div className="absolute top-3 right-3 z-20 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
                   {hoveredImageIndex + 1} / {propertyImages.length}
                 </div>
               )}
             </div>
           </Link>
-          
-          {/* Status Tag - Top Left (single clean badge) */}
-          <div className="absolute top-3 left-3 z-10">
-            <span className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide shadow-lg ${
-              statusColors[primaryStatus] || statusColors[primaryStatus.toUpperCase()] || "bg-slate-700"
-            } text-white`}>
-              {isReadyToMove ? "Ready to Move" : primaryStatus}
-            </span>
+
+          {/* Status badges — same labels & semantics as dashboard property list */}
+          <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-wrap items-center gap-1">
+            {statuses.slice(0, 2).map((status, idx) => (
+              <span
+                key={`${status}-${idx}`}
+                className={`inline-flex max-w-full items-center truncate rounded-full px-2.5 py-1 text-[10px] font-semibold shadow-md sm:text-[11px] ${statusBadgeClass(status)}`}
+                title={status}
+              >
+                {status}
+              </span>
+            ))}
+            {statuses.length > 2 && (
+              <span
+                className="inline-flex items-center rounded-full border border-white/35 bg-black/45 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm sm:text-[11px]"
+                title={statuses.slice(2).join(", ")}
+              >
+                +{statuses.length - 2}
+              </span>
+            )}
+            {occupancyLabel ? (
+              <span
+                className="inline-flex max-w-full items-center truncate rounded-full border border-white/40 bg-black/35 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm sm:text-[11px]"
+                title={occupancyLabel}
+              >
+                {occupancyLabel}
+              </span>
+            ) : null}
           </div>
-          
-          {/* Share button - Top right (on hover) */}
-          <div className={`absolute top-3 right-3 flex gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+
+          <div
+            className={`absolute right-3 top-12 z-10 transition-all duration-300 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"}`}
+          >
             <button
               onClick={handleShare}
-              className="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white hover:text-primary backdrop-blur-sm shadow-lg transition-all"
+              className="rounded-full bg-white/95 p-2 text-foreground shadow-md transition hover:bg-white hover:text-primary"
               aria-label="Share property"
+              type="button"
             >
               <Share2 className="h-4 w-4" />
             </button>
           </div>
-          
-          {/* Year Tag - Bottom Left */}
-          {yearDisplay && (
-            <div className="absolute bottom-3 left-3 z-10">
-              <span className="px-3 py-1.5 rounded bg-slate-700/90 text-white text-xs font-bold shadow-lg">
-                {yearDisplay}
+
+          {/* Bottom meta: posted + author */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex items-end justify-between gap-2 bg-black/45 px-3 py-2.5 text-[11px] text-white backdrop-blur-[2px] sm:text-xs">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5 shrink-0 opacity-90" />
+              <span className="truncate font-medium">
+                {postedLabel || (yearDisplay ? `Since ${yearDisplay}` : "Listed")}
               </span>
             </div>
-          )}
-          
-          {/* Image Navigation Arrows - Always visible when multiple images exist */}
+            <div className="flex min-w-0 max-w-[55%] items-center justify-end gap-1.5">
+              <User className="h-3.5 w-3.5 shrink-0 opacity-90" />
+              <span className="truncate text-right font-medium">{authorName}</span>
+            </div>
+          </div>
+
           {hasMultipleImages && (
             <>
               <button
                 onClick={prevImage}
-                className="image-nav absolute left-3 top-1/2 -translate-y-1/2 bg-white hover:bg-primary hover:text-white text-gray-900 p-3.5 rounded-full shadow-2xl transition-all z-[60] hover:scale-110 border-2 border-gray-300 hover:border-primary cursor-pointer opacity-100"
+                className="image-nav absolute left-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-white/30 bg-white/90 p-2 text-foreground shadow-md transition hover:bg-primary hover:text-primary-foreground"
                 aria-label="Previous image"
                 title="Previous image"
                 type="button"
-                style={{ zIndex: 60 }}
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={nextImage}
-                className="image-nav absolute right-3 top-1/2 -translate-y-1/2 bg-white hover:bg-primary hover:text-white text-gray-900 p-3.5 rounded-full shadow-2xl transition-all z-[60] hover:scale-110 border-2 border-gray-300 hover:border-primary cursor-pointer opacity-100"
+                className="image-nav absolute right-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-white/30 bg-white/90 p-2 text-foreground shadow-md transition hover:bg-primary hover:text-primary-foreground"
                 aria-label="Next image"
                 title="Next image"
                 type="button"
-                style={{ zIndex: 60 }}
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </>
           )}
         </div>
 
-        <CardContent className="p-5 pb-4 flex-1 flex flex-col">
-          <Link href={getPropertyUrl(property)} className="block">
-            <h3 className="text-lg font-bold mb-1 text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+        <CardContent className="flex flex-1 flex-col gap-3 p-4 pt-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary line-clamp-2">
+            {categoryLine}
+          </p>
+
+          <Link href={getPropertyUrl(property)} className="block min-h-[2.75rem]">
+            <h3 className="text-base font-bold leading-snug text-foreground line-clamp-2 transition-colors group-hover:text-primary md:text-lg">
               {property.name}
             </h3>
           </Link>
 
-          {/* Address / Location */}
           {displayAddress && (
-            <p className="text-sm text-gray-600 mb-1 line-clamp-1 truncate">
-              {displayAddress}
-            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{displayAddress}</p>
           )}
 
-          {/* City with MapPin */}
-          <div className="flex items-center gap-1.5 min-w-0 mb-3">
-            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="text-sm text-gray-600 truncate">{property.location}</span>
+          {property.location && property.location !== displayAddress && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
+              <span className="truncate">{property.location}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3 border-t border-border pt-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Maximize2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-foreground">{sqftDisplay}</span>
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Bed className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span className="text-muted-foreground">
+                {Array.isArray(capacities) && capacities.length > 0 ? (
+                  <span className="font-semibold leading-snug text-foreground line-clamp-2">
+                    {bhkConfig}
+                  </span>
+                ) : (
+                  <>
+                    <span className="font-semibold text-foreground">{property.bedrooms}</span>{" "}
+                    Bedrooms
+                  </>
+                )}
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Bath className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-foreground">{property.bathrooms}</span>{" "}
+                Bathrooms
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Car className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span className="line-clamp-2 text-muted-foreground">
+                <span className="font-semibold text-foreground">{fourthSpec}</span>
+              </span>
+            </div>
           </div>
 
-          {/* Starting Price */}
-          <div className="mb-3">
-            <p className="text-base font-bold text-gray-900">
-              Starting Price {formatIndianPrice(property.price)}
-            </p>
+          {/* Price strip — primary + dark (brand) */}
+          <div className="-mx-4 mt-auto flex min-h-[52px] w-[calc(100%+2rem)] overflow-hidden border-t border-border">
+            <div
+              className="flex min-h-[52px] min-w-[38%] max-w-[46%] shrink-0 items-center justify-center bg-primary px-3 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-primary-foreground sm:text-[11px]"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%)",
+              }}
+            >
+              {isRent ? "For rent" : "For sale"}
+            </div>
+            <div className="relative flex min-h-[52px] flex-1 items-center justify-end bg-zinc-900 px-3 py-2 pl-8 text-right text-xs font-bold text-white sm:text-sm -ml-2">
+              <span className="line-clamp-2">{formatIndianPrice(property.price)}</span>
+            </div>
           </div>
 
-          {/* Bedroom Configuration */}
-          <div className="flex items-center gap-1.5 min-w-0 mb-4">
-            <Bed className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="text-sm text-gray-600">
-              Bedroom: {bhkConfig}
-              {property.area && ` • ${property.area}`}
-            </span>
-          </div>
-
-          {/* Action Buttons - See Details (gold) | Contact Us (dark) */}
-          <div className="flex gap-2 mt-auto">
-            <Link href={getPropertyUrl(property)} className="flex-1 min-w-0">
+          <div className="flex gap-2 pt-1">
+            <Link href={getPropertyUrl(property)} className="min-w-0 flex-1">
               <Button
-                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 h-auto transition-all duration-300 hover:scale-[1.02]"
+                className="h-10 w-full gap-1.5 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                type="button"
               >
-                <Eye className="h-4 w-4 flex-shrink-0" />
-                See Details
+                <Eye className="h-4 w-4 shrink-0" />
+                View details
               </Button>
             </Link>
             <Button
               onClick={handleWhatsApp}
-              className="flex-1 min-w-0 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 h-auto transition-all duration-300 hover:scale-[1.02]"
+              type="button"
+              className="h-10 min-w-0 flex-1 gap-1.5 rounded-md bg-slate-800 px-3 text-sm font-semibold text-white hover:bg-slate-700"
             >
-              <MessageSquare className="h-4 w-4 flex-shrink-0" />
-              Contact Us
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              Contact
             </Button>
           </div>
         </CardContent>

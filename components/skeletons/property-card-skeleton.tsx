@@ -3,29 +3,23 @@ import { Card } from "@/components/ui/card";
 
 export function PropertyCardSkeleton() {
   return (
-    <Card className="overflow-hidden">
-      {/* Image Skeleton */}
-      <Skeleton className="w-full h-48 md:h-64" />
-      
-      <div className="p-4 space-y-3">
-        {/* Title */}
-        <Skeleton className="h-6 w-3/4" />
-        
-        {/* Location */}
-        <Skeleton className="h-4 w-1/2" />
-        
-        {/* Price */}
-        <Skeleton className="h-8 w-2/3" />
-        
-        {/* Features */}
-        <div className="flex gap-4">
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-16" />
+    <Card className="overflow-hidden border border-border shadow-md">
+      <Skeleton className="h-60 w-full rounded-none" />
+      <div className="space-y-3 p-4">
+        <Skeleton className="h-3 w-2/3" />
+        <Skeleton className="h-6 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <div className="grid grid-cols-2 gap-3 border-t border-border pt-3">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
         </div>
-        
-        {/* Button */}
-        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-[52px] w-full rounded-none" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 flex-1 rounded-md" />
+          <Skeleton className="h-10 flex-1 rounded-md" />
+        </div>
       </div>
     </Card>
   );

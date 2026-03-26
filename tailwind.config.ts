@@ -81,6 +81,7 @@ const config = {
       },
       fontFamily: {
         sans: ['Gordita', 'system-ui', 'sans-serif'],
+        figtree: ['var(--font-figtree)', 'Figtree', 'system-ui', 'sans-serif'],
         gordita: ['Gordita', 'sans-serif'],
         forum: ['var(--font-forum)', 'Forum', 'serif'],
         heading: ['var(--font-forum)', 'Forum', 'serif'],
