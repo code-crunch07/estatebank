@@ -21,8 +21,6 @@ import {
   Bath,
   Car,
   Maximize2,
-  Eye,
-  MessageSquare,
   Share2,
   ChevronLeft,
   ChevronRight,
@@ -106,12 +104,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredImageIndex, setHoveredImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-
-  const handleWhatsApp = () => {
-    const message = `Hi, I'm interested in ${property.name} - ${property.location} (${property.price})`;
-    const whatsappUrl = `https://wa.me/919820590353?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
 
   // Format BHK configuration - use capacities if available (e.g. "2BHK And 3BHK")
   const capacities = (property as any).capacities;
@@ -340,12 +332,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <>
       <Card 
-        className="overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 rounded-lg bg-card border border-border shadow-md h-full flex flex-col group cursor-pointer"
+        className="overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 rounded-none bg-card border border-border shadow-md h-full flex flex-col group cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image Section */}
-        <div className="relative h-60 w-full overflow-hidden bg-muted">
+        <div className="p-4">
+          <div className="relative h-60 w-full overflow-hidden bg-muted">
           <Link href={getPropertyUrl(property)} className="block h-full w-full">
             <div className="relative h-full w-full">
               <Image
@@ -449,6 +442,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               </button>
             </>
           )}
+          </div>
         </div>
 
         <CardContent className="flex flex-1 flex-col gap-3 p-4 pt-4">
@@ -510,39 +504,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
           </div>
 
-          {/* Price strip — primary + dark (brand) */}
-          <div className="-mx-4 mt-auto flex min-h-[52px] w-[calc(100%+2rem)] overflow-hidden border-t border-border">
-            <div
-              className="flex min-h-[52px] min-w-[38%] max-w-[46%] shrink-0 items-center justify-center bg-primary px-3 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-primary-foreground sm:text-[11px]"
-              style={{
-                clipPath: "polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%)",
-              }}
-            >
-              {isRent ? "For rent" : "For sale"}
-            </div>
-            <div className="relative flex min-h-[52px] flex-1 items-center justify-end bg-zinc-900 px-3 py-2 pl-8 text-right text-xs font-bold text-white sm:text-sm -ml-2">
-              <span className="line-clamp-2">{formatIndianPrice(property.price)}</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2 pt-1">
-            <Link href={getPropertyUrl(property)} className="min-w-0 flex-1">
-              <Button
-                className="h-10 w-full gap-1.5 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-                type="button"
-              >
-                <Eye className="h-4 w-4 shrink-0" />
-                View details
-              </Button>
-            </Link>
-            <Button
-              onClick={handleWhatsApp}
-              type="button"
-              className="h-10 min-w-0 flex-1 gap-1.5 rounded-md bg-slate-800 px-3 text-sm font-semibold text-white hover:bg-slate-700"
-            >
-              <MessageSquare className="h-4 w-4 shrink-0" />
-              Contact
-            </Button>
+          {/* Price row (strip UI removed) */}
+          <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-3 py-2">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
+              {isRent ? "For rent" : "View details"}
+            </span>
+            <span className="text-sm font-bold text-foreground">
+              {formatIndianPrice(property.price)}
+            </span>
           </div>
         </CardContent>
       </Card>
